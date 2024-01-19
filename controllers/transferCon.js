@@ -35,7 +35,7 @@ exports.transfer = async(req,res)=>{
         const receiver = await userModel.findOne({acctNum:Acct})
         if (!receiver) {
             return res.status(404).json({
-                message:"oops, you can only make transfer customer on this platform "
+                message:"oops, you can only make transfer to customer on this platform "
             })
         }
 
@@ -132,6 +132,6 @@ exports.transfer = async(req,res)=>{
     } catch (err) {
         res.status(500).json({
             message:err.message
-        })
+        }) 
     }
 }
