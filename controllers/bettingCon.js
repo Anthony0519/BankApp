@@ -15,6 +15,9 @@ exports.betting = async(req,res)=>{
         // get the details for transaction
         const {amount,pin,betId} = req.body
 
+        const newAmount = Number(amount)
+
+
         // check if the user has a pin
          if (user.Pin === '0') {
             return res.status(400).json({
@@ -30,14 +33,14 @@ exports.betting = async(req,res)=>{
         }
 
         // check if the user's balance is sufficient to the inputed amount
-        if (user.acctBalance < amount) {
+        if (user.acctBalance < newAmount) {
             return res.status(400).json({
                 message:"insufficient funds"
             })
         }
 
-    // deduct amount from user's balance and save
-    const minus = user.acctBalance - amount
+    // deduct newAmount from user's balance and save
+    const minus = user.acctBalance - newAmount
     user.acctBalance = minus
     await user.save()
 
@@ -57,14 +60,14 @@ exports.betting = async(req,res)=>{
             userId:user._id,
             transactionType:betting.transactionType,
             to:betId,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
         })
         await History.save()
 
         // create a notification msg for the sender and save
         if (minus) {
             // customize the notification msg
-            const msg = `hi ${user.firstName} you just funded ${amount} naira to your betting account`
+            const msg = `hi ${user.firstName} you just funded ${newAmount} naira to your betting account`
             const message = new msgModel({
                 userId:user._id,
                 msg

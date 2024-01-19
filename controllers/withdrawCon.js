@@ -14,6 +14,11 @@ exports.withdraw = async(req,res)=>{
         // get the details for transaction
         const {amount,pin} = req.body
 
+        const newAmount = Number(amount)
+
+
+
+
         // check if the user has a pin
          if (withdrawal.Pin === '0') {
             return res.status(400).json({
@@ -29,21 +34,21 @@ exports.withdraw = async(req,res)=>{
         }
 
         // check if the sender's balance is sufficient to the inputed amount
-        if (withdrawal.acctBalance < amount) {
+        if (withdrawal.acctBalance < newAmount) {
             return res.status(400).json({
                 message:"insufficient funds"
             })
         }
 
     // deduct amount from withdrawal balance and save
-    const minus = withdrawal.acctBalance - amount
+    const minus = withdrawal.acctBalance - newAmount
     withdrawal.acctBalance = minus
     await withdrawal.save()
 
     //    save the transaction
         const withdraw = new withdrawModel({
             user:withdrawal._id,
-            amount:amount
+            amount:newAmount
         })
         await withdraw.save()
         // save the transfer id to the user
@@ -54,14 +59,14 @@ exports.withdraw = async(req,res)=>{
         const History = new historyModel({
             userId:withdrawal._id,
             transactionType:withdraw.transactionType,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
         })
         await History.save()
 
         // create a notification msg for the sender and save
         if (minus) {
             // customize the notification msg
-            const msg = `hi ${withdrawal.firstName} ${withdrawal.lastName.slice(0,1).toUpperCase()}, you just withdrew ${amount} from your balance`
+            const msg = `hi ${withdrawal.firstName} ${withdrawal.lastName.slice(0,1).toUpperCase()}, you just withdrew ${newAmount} from your balance`
             const message = new msgModel({
                 userId:withdrawal._id,
                 msg

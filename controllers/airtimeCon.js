@@ -16,6 +16,10 @@ exports.airtime = async(req,res)=>{
         // get the details for transaction
         const {phoneNumber, network, amount, pin} = req.body
 
+        const newAmount = Number(amount)
+
+        
+
             // check if the user has a pin
          if (user.Pin === '0') {
             return res.status(400).json({
@@ -31,14 +35,14 @@ exports.airtime = async(req,res)=>{
         }
 
         // check if the user's balance is sufficient to the inputed amount
-        if (user.acctBalance < amount) {
+        if (user.acctBalance < newAmount) {
             return res.status(400).json({
                 message:"insufficient funds"
             })
         }
 
-    // deduct amount from user's balance and save
-    const minus = user.acctBalance - amount
+    // deduct newAmount from user's balance and save
+    const minus = user.acctBalance - newAmount
     user.acctBalance = minus
     await user.save()
 
@@ -60,14 +64,14 @@ exports.airtime = async(req,res)=>{
             transactionType:airtime.transactionType,
             to:phoneNumber,
             network,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
         })
         await History.save()
 
         // create a notification msg for the sender and save
         if (minus) {
             // customize the notification msg
-            const msg = `hi ${user.firstName} you just recharged ${airtime.amount}  to ${airtime.phoneNumber}`
+            const msg = `hi ${user.firstName} you just recharged ${airtime.newAmount}  to ${airtime.phoneNumber}`
             const message = new msgModel({
                 userId:user._id,
                 msg

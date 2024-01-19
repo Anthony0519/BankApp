@@ -14,6 +14,8 @@ exports.transfer = async(req,res)=>{
 
         // get the details for transaction
         const {Acct,amount,desc,pin} = req.body
+        const newAmount = Number(amount)
+
 
         // check if the user has a pin
         if (sender.Pin === '0') {
@@ -38,7 +40,7 @@ exports.transfer = async(req,res)=>{
         }
 
         // check if the sender's balance is sufficient to the inputed amount
-        if (sender.acctBalance < amount) {
+        if (sender.acctBalance < newAmount) {
             return res.status(400).json({
                 message:"insufficient funds"
             })
@@ -51,12 +53,12 @@ exports.transfer = async(req,res)=>{
     //    const add = await userModel.updateOne({acctNum:Acct},{$inc:{acctBalance: amount}})
 
     // deduct amount from senders balance and save
-    const minus = sender.acctBalance - amount
+    const minus = sender.acctBalance - newAmount
     sender.acctBalance = minus
     await sender.save()
 
     // add the amount to the receiver's balance
-    const add = receiver.acctBalance + amount
+    const add = receiver.acctBalance + newAmount
     receiver.acctBalance = add
     await receiver.save()
 
@@ -68,7 +70,7 @@ exports.transfer = async(req,res)=>{
             senderName:`${sender.firstName} ${sender.lastName}`,
             receiverName:`${receiver.firstName} ${receiver.lastName}`,
             desc,
-            amount:amount
+            amount:newAmount
         })
         await Transfer.save()
         // save the transfer id to the user
@@ -79,7 +81,7 @@ exports.transfer = async(req,res)=>{
         const senderHistory = new historyModel({
             userId:sender._id,
             transactionType:Transfer.transactionType,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
             from:`${sender.firstName} ${sender.lastName}`,
             to:`${receiver.firstName} ${receiver.lastName}`,
             desc,
@@ -90,7 +92,7 @@ exports.transfer = async(req,res)=>{
         const receiverHistory = new historyModel({
             userId:receiver._id,
             transactionType:Transfer.transactionType,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
             from:`${sender.firstName} ${sender.lastName}`,
             to:`${receiver.firstName} ${receiver.lastName}`,
             desc,
@@ -100,7 +102,7 @@ exports.transfer = async(req,res)=>{
         // create a notification msg for the sender and save
         if (minus) {
             // customize the notification msg
-            const msg = `hi ${sender.firstName}, you have successfully transfered ${amount} naira to ${receiver.firstName} ${receiver.lastName}`
+            const msg = `hi ${sender.firstName}, you have successfully transfered ${newAmount} naira to ${receiver.firstName} ${receiver.lastName}`
             const message1 = new msgModel({
                 userId:sender._id,
                 msg
@@ -111,7 +113,7 @@ exports.transfer = async(req,res)=>{
         // create a notification msg for the receiver and save
         if (add) {
             // customize the notification msg
-            const msg = `hi ${receiver.firstName}, you just received ${amount} naira from ${sender.firstName} ${sender.lastName}`
+            const msg = `hi ${receiver.firstName}, you just received ${newAmount} naira from ${sender.firstName} ${sender.lastName}`
             const message2 = new msgModel({
                 userId:receiver._id,
                 msg
