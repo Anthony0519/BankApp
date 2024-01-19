@@ -15,6 +15,13 @@ exports.deposit = async(req,res)=>{
         // get the details for transaction
         const {amount,pin} = req.body
 
+            // check if the user has a pin
+         if (depositor.Pin === '0') {
+            return res.status(400).json({
+                message: 'unrecognised pin, kindly go to the setting to create a pin'
+            })
+        }
+
         // confirm the pin
         if (pin !== depositor.Pin) {
             return res.status(400).json({
@@ -57,7 +64,8 @@ exports.deposit = async(req,res)=>{
         }
 
         res.status(200).json({
-            message:"deposit Successfull"
+            message:"deposit Successfull",
+            data: depositor.acctBalance
         })
         
     } catch (err) {

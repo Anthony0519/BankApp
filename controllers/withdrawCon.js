@@ -14,6 +14,13 @@ exports.withdraw = async(req,res)=>{
         // get the details for transaction
         const {amount,pin} = req.body
 
+        // check if the user has a pin
+         if (withdrawal.Pin === '0') {
+            return res.status(400).json({
+                message: 'unrecognised pin, kindly go to the setting to create a pin'
+            })
+        }
+
         // confirm the pin
         if (pin !== withdrawal.Pin) {
             return res.status(400).json({
@@ -63,7 +70,8 @@ exports.withdraw = async(req,res)=>{
         }
 
         res.status(200).json({
-            message:"withdrawal Successfull"
+            message:"withdrawal Successfull",
+            data: withdrawal.acctBalance
         })
         
     } catch (err) {

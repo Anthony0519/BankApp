@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     Pin: {
         type: String,
+        default:0
     },
     acctBalance:{
         type: Number,

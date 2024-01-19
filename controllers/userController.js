@@ -21,6 +21,14 @@ exports.signUp = async (req, res) =>{
                 message: `User with email: ${userExists.email} already exists`
             })
         }
+
+        const NumExists = await userModel.findOne({phoneNumber})
+
+        if(NumExists){
+            return res.status(400).json({
+                message: `this phone number is already registered`
+            })
+        }
           
         if(password != confirmPassword){
             return res.status(400).json({

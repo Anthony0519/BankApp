@@ -15,6 +15,13 @@ exports.transfer = async(req,res)=>{
         // get the details for transaction
         const {Acct,amount,desc,pin} = req.body
 
+        // check if the user has a pin
+        if (sender.Pin === '0') {
+            return res.status(400).json({
+                message: 'unrecognised pin, kindly go to the setting to create a pin'
+            })
+        }
+
         // confirm the pin
         if (pin !== sender.Pin) {
             return res.status(400).json({
@@ -113,7 +120,11 @@ exports.transfer = async(req,res)=>{
         }
 
         res.status(200).json({
-            message:"Transaction Successfull"
+            message:"Transaction Successfull",
+            data:{
+                sender:sender.acctBalance,
+                receiver:receiver.acctBalance
+            }
         })
         
     } catch (err) {
