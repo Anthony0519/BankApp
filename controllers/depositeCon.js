@@ -14,6 +14,7 @@ exports.deposit = async(req,res)=>{
 
         // get the details for transaction
         const {amount,pin} = req.body
+        const newAmount = Number(amount)
 
             // check if the user has a pin
          if (depositor.Pin === '0') {
@@ -30,14 +31,14 @@ exports.deposit = async(req,res)=>{
         }
 
     // deduct amount from withdrawal balance and save
-    const add = depositor.acctBalance + amount
+    const add = depositor.acctBalance + newAmount
     depositor.acctBalance = add
     await depositor.save()
 
     //    save the transaction
         const deposit = new depositModel({
             user:depositor._id,
-            amount:`${amount}`
+            amount:`${newAmount}`
         })
         await deposit.save()
         // save the transfer id to the user
@@ -48,14 +49,14 @@ exports.deposit = async(req,res)=>{
         const History = new historyModel({
             userId:depositor._id,
             transactionType:deposit.transactionType,
-            amount:`${amount}`,
+            amount:`${newAmount}`,
         })
         await History.save()
 
         // create a notification msg for the sender and save
         if (add) {
             // customize the notification msg
-            const msg = `hi ${depositor.firstName} ${depositor.lastName.slice(0,1).toUpperCase()}, you just deposited ${amount} to your balance`
+            const msg = `hi ${depositor.firstName} ${depositor.lastName.slice(0,1).toUpperCase()}, you just deposited ${newAmount} to your balance`
             const message = new msgModel({
                 userId:depositor._id,
                 msg
