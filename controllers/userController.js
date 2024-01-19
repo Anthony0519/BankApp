@@ -186,7 +186,8 @@ exports.createPin = async (req, res) =>{
         }
         
 
-       user.pin = pin
+       user.Pin = pin
+       user.save()
 
         res.status(201).json({
             message: `Pin created successfully`,
