@@ -1,5 +1,5 @@
 {
-    "name": "the-bitpay-capital-back-end",
+    "name": "two-pay-bank-app",
     "builds": [
       {
         "src": "server.js",
